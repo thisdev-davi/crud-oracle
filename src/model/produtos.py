@@ -21,9 +21,6 @@ class Produto:
     def get_categoria(self):
         return self._categoria
     
-    def get_categoria(self):
-        return self._categoria.get_nome()
-    
     def set_id(self, id:int):
         self._id = id
     
