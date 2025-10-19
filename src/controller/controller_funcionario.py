@@ -9,7 +9,7 @@ class ControllerFuncionario:
         bd = ConexaoOracle(can_write=True)
         bd.connect()
         
-        cpf = input("Digite o CPF do funcionário novo: ")
+        cpf = input("CPF do funcionário novo: ")
         if not self.existencia_funcionario(bd, cpf):
             nome = input("Nome do funcionário: ")
             telefone = input("Telefone do funcionário: ")
@@ -27,12 +27,12 @@ class ControllerFuncionario:
         bd = ConexaoOracle(can_write=True)
         bd.connect()
 
-        cpf = input("Digite o CPF do funcionário a ser excluído: ")
+        cpf = input("CPF do funcionário a ser excluído: ")
         if self.existencia_funcionario(bd, cpf):
             check_fk = f"SELECT 1 FROM MOVIMENTACAO_ESTOQUE WHERE CPF_FUNCIONARIO = '{cpf}'"
             if bd.sqlToTuple(check_fk):
-               print("Funcionário não pode ser excluído!\n**Está associado na tabela MOVIMENTACAO_ESTOQUE")
-            return
+                print("Funcionário não pode ser excluído!\n**Está associado na tabela MOVIMENTACAO_ESTOQUE")
+                return
             dados_funcionario = bd.sqlToTuple(f"SELECT CPF, NOME, TELEFONE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
             bd.write(f"DELETE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
 
@@ -58,7 +58,6 @@ class ControllerFuncionario:
         else:
             print("CPF não encontrado!")
             return None
-        
 
     def existencia_funcionario(self, bd:ConexaoOracle, cpf:str):
         query = f"SELECT 1 FROM FUNCIONARIOS WHERE CPF = '{cpf}'"
