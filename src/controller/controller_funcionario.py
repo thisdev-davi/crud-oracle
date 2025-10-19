@@ -1,5 +1,5 @@
 from model.funcionarios import Funcionario
-from conexion.oracle_connection import ConexaoOracle
+from connexion.conexao_oracle import ConexaoOracle
 
 class ControllerFuncionario:
     def __init__(self):
@@ -16,9 +16,12 @@ class ControllerFuncionario:
             bd.write(f"INSERT INTO FUNCIONARIOS (CPF, NOME , TELEFONE) VALUES ('{cpf}', '{nome}', '{telefone}')")
 
             dados_funcionario = bd.sqlToTuple(f"SELECT CPF, NOME, TELEFONE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
-            funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
-            print(f"{funcionario} cadastrado.")
-            return funcionario
+            if dados_funcionario:
+                funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
+                print(f"{funcionario} cadastrado.")
+                return funcionario
+            else:
+                print("Erro ao buscar o funcionário cadastrado!")
         else:
             print("CPF já cadastrado!")
             return None
@@ -33,11 +36,14 @@ class ControllerFuncionario:
             if bd.sqlToTuple(check_fk):
                 print("Funcionário não pode ser excluído!\n**Está associado na tabela MOVIMENTACAO_ESTOQUE")
                 return
+            
             dados_funcionario = bd.sqlToTuple(f"SELECT CPF, NOME, TELEFONE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
             bd.write(f"DELETE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
-
-            funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
-            print(f"{funcionario} excluído.")
+            if dados_funcionario:
+                funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
+                print(f"{funcionario} excluído.")
+            else:
+                print("Erro ao buscar o funcionário excluído!")
         else:
             print("CPF não encontrado!")
 
@@ -52,14 +58,25 @@ class ControllerFuncionario:
             bd.write(f"UPDATE FUNCIONARIOS SET NOME = '{nome}', TELEFONE = '{telefone}' WHERE CPF = '{cpf}'")
 
             dados_funcionario = bd.sqlToTuple(f"SELECT CPF, NOME, TELEFONE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
-            funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
-            print(f"{funcionario} atualizado.")
-            return funcionario
+            if dados_funcionario:
+                funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
+                print(f"{funcionario} atualizado.")
+                return funcionario
+            else:
+                print("Erro ao buscar o funcionário atualizado!")
         else:
             print("CPF não encontrado!")
             return None
 
     def existencia_funcionario(self, bd:ConexaoOracle, cpf:str):
         query = f"SELECT 1 FROM FUNCIONARIOS WHERE CPF = '{cpf}'"
-        resultado = bd.sqlToTuple(query)
-        return bool(resultado)
+        return True if bd.sqlToTuple(query) else False
+    
+    def buscar_funcionario(self, bd:ConexaoOracle, cpf:str):
+        dados_funcionario = bd.sqlToTuple(f"SELECT CPF, NOME, TELEFONE FROM FUNCIONARIOS WHERE CPF = '{cpf}'")
+        if dados_funcionario:
+            funcionario = Funcionario(dados_funcionario[0], dados_funcionario[1], dados_funcionario[2])
+            return funcionario
+        else:
+            print("CPF não encontrado!")
+            return None

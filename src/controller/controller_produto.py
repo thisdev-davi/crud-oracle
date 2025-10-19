@@ -1,4 +1,4 @@
-from conexion.oracle_connection import ConexaoOracle
+from connexion.conexao_oracle import ConexaoOracle
 from model.produtos import Produto
 
 class ControllerProduto:
@@ -18,9 +18,12 @@ class ControllerProduto:
             bd.write(f"INSERT INTO PRODUTOS (ID_PRODUTO, NOME , PRECO_UNITARIO, DESCRICAO, CATEGORIA) VALUES ({id}, '{nome}', {preco}, '{descricao}', '{categoria}')")
 
             dados_produto = bd.sqlToTuple(f"SELECT ID_PRODUTO, NOME, PRECO_UNITARIO, DESCRICAO, CATEGORIA FROM PRODUTOS WHERE ID_PRODUTO = {id}")
-            produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
-            print(f"{produto} cadastrado.")
-            return produto
+            if dados_produto:
+                produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
+                print(f"{produto} cadastrado.")
+                return produto
+            else:
+                print("Erro ao buscar o produto cadastrado!")
         else:
             print("ID já cadastrado!")
             return None
@@ -34,13 +37,15 @@ class ControllerProduto:
             check_fk = f"SELECT 1 FROM PRODUTOS_FORNECEDORES WHERE ID_PRODUTO = {id}"
             if bd.sqlToTuple(check_fk):
                print("Produto não pode ser excluido!\n**Está associada na tabela PRODUTOS_FORNECEDORES") 
-                return
+               return
                 
             dados_produto = bd.sqlToTuple(f"SELECT ID_PRODUTO, NOME, PRECO_UNITARIO, DESCRICAO, CATEGORIA FROM PRODUTOS WHERE ID_PRODUTO = {id}")
             bd.write(f"DELETE FROM PRODUTOS WHERE ID_PRODUTO = {id}")
-
-            produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
-            print(f"{produto} excluído.")
+            if dados_produto:
+                produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
+                print(f"{produto} excluído.")
+            else:
+                print("Erro ao buscar o produto excluído!")
         else:
             print("ID não encontrado!")
 
@@ -57,14 +62,25 @@ class ControllerProduto:
             bd.write(f"UPDATE PRODUTOS SET NOME = '{nome}', PRECO_UNITARIO = {preco}, DESCRICAO = '{descricao}', CATEGORIA = '{categoria}' WHERE ID_PRODUTO = {id}")
 
             dados_produto = bd.sqlToTuple(f"SELECT ID_PRODUTO, NOME, PRECO_UNITARIO, DESCRICAO, CATEGORIA FROM PRODUTOS WHERE ID_PRODUTO = {id}")
-            produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
-            print(f"{produto} atualizado.")
-            return produto
+            if dados_produto:
+                produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
+                print(f"{produto} atualizado.")
+                return produto
+            else:
+                print("Erro ao buscar o produto atualizado!")
         else:
             print("ID não encontrado!")
             return None
 
     def existencia_produto(self, bd:ConexaoOracle, id:int):
         query = f"SELECT 1 FROM PRODUTOS WHERE ID_PRODUTO = {id}"
-        resultado = bd.sqlToTuple(query)
-        return bool(resultado)
+        return True if bd.sqlToTuple(query) else False
+    
+    def buscar_produto(self, bd:ConexaoOracle, id:int):
+        dados_produto = bd.sqlToTuple(f"SELECT ID_PRODUTO, NOME, PRECO_UNITARIO, DESCRICAO, CATEGORIA FROM PRODUTOS WHERE ID_PRODUTO = {id}")
+        if dados_produto:
+            produto = Produto(dados_produto[0], dados_produto[1], dados_produto[2], dados_produto[3], dados_produto[4])
+            return produto
+        else:
+            print("ID não encontrado!")
+            return None
