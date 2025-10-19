@@ -32,6 +32,24 @@ class ConexaoOracle:
             print(e)
             sys.exit(1)
 
+    def sqlToMatrix(self, query:str):
+        try:
+            self.cur.execute(query)
+            rows = self.cur.fetchall()
+            return rows
+        except oracledb.DatabaseError as e:
+            print(e)
+            return []
+
+    def sqlToTuple(self, query:str):
+        try:
+            self.cur.execute(query)
+            row = self.cur.fetchone() 
+            return row 
+        except oracledb.DatabaseError as e:
+            print(e)
+            return None
+
     def write(self, query:str):
         if not self.can_write:
             raise Exception("")
@@ -42,15 +60,6 @@ class ConexaoOracle:
         except oracledb.DatabaseError as e:
             print()
             self.conn.rollback()
-
-    def sqlToMatrix(self, query:str):
-        try:
-            self.cur.execute(query)
-            rows = self.cur.fetchall()
-            return rows
-        except oracledb.DatabaseError as e:
-            print(e)
-            return []
 
     def close(self):
         if self.cur:
