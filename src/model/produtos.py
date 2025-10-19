@@ -1,5 +1,5 @@
 class Produto:
-    def __init__(self, nome:str, preco_unitario:float, descricao:str, categoria:str, id:int=None):
+    def __init__(self, id:int=None, nome:str=None, preco_unitario:float=None, descricao:str=None, categoria:str=None):
         self._id = id
         self._nome = nome
         self._preco_unitario = preco_unitario
